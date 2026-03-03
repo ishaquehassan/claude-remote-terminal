@@ -1,0 +1,52 @@
+# Flutter
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.pub-cache/
+app/.pub/
+app/build/
+app/*.g.dart
+
+# Dart
+.dart_tool/
+.packages
+pubspec.lock
+
+# Android
+app/android/.gradle/
+app/android/local.properties
+app/android/key.properties
+app/android/*.jks
+app/android/app/google-services.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+*.egg
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+
+# Logs
+*.log
+/tmp/
+
+# Keys / secrets
+*.pem
+*.key
+*.p12
+*.keystore
