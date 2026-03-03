@@ -4,6 +4,7 @@ import '../services/terminal_service.dart';
 import '../services/language_service.dart';
 import '../l10n.dart';
 import 'terminal_screen.dart';
+import 'connect_screen.dart';
 
 class SessionsScreen extends StatelessWidget {
   const SessionsScreen({super.key});
@@ -91,6 +92,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final serverName = svc.connectedServerName ?? svc.connectedHost ?? '';
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -103,7 +105,7 @@ class _Header extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
+          padding: const EdgeInsets.fromLTRB(20, 12, 8, 12),
           child: Row(
             children: [
               Container(
@@ -117,23 +119,55 @@ class _Header extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  s.sessions,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      s.sessions,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    if (serverName.isNotEmpty)
+                      Text(
+                        serverName,
+                        style: const TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontSize: 10,
+                          fontFamily: 'JetBrainsMono',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
                 ),
+              ),
+              // Change server button
+              IconButton(
+                icon: const Icon(Icons.swap_horiz, color: Color(0xFF3D4A5C), size: 20),
+                tooltip: 'Change server',
+                onPressed: () {
+                  svc.disconnect();
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => const ConnectScreen(forceShowList: true),
+                    ),
+                    (r) => false,
+                  );
+                },
+                padding: const EdgeInsets.all(6),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               ),
               // Language toggle
               LangToggle(lang: lang),
-              const SizedBox(width: 6),
               // Connection dot
               Container(
                 width: 8, height: 8,
-                margin: const EdgeInsets.only(left: 6, right: 4),
+                margin: const EdgeInsets.only(left: 8, right: 4),
                 decoration: BoxDecoration(
                   color: svc.isConnected
                       ? const Color(0xFFE07845)

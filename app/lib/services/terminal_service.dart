@@ -45,6 +45,10 @@ class TerminalService extends ChangeNotifier {
   Completer<String>? _pendingNewSession;
   String? autoOpenSessionId; // set when server requests auto-navigation
 
+  // Connected server info
+  String? connectedServerName;
+  String? get connectedHost => _savedHost;
+
   // Pairing
   bool isPairRequired = false;
   bool pairFailed = false;
@@ -75,10 +79,11 @@ class TerminalService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> connect(String host, int port, String token) async {
+  Future<void> connect(String host, int port, String token, {String? serverName}) async {
     _savedHost = host;
     _savedPort = port;
     _savedToken = token;
+    connectedServerName = serverName ?? host;
 
     isConnecting = true;
     errorMsg = null;
@@ -384,6 +389,7 @@ class TerminalService extends ChangeNotifier {
   void disconnect() {
     _reconnectTimer?.cancel();
     _savedHost = null;
+    connectedServerName = null;
     isReconnecting = false;
     _sub?.cancel();
     _channel?.sink.close();

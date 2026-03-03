@@ -10,7 +10,8 @@ import 'sessions_screen.dart';
 import 'pairing_screen.dart';
 
 class ConnectScreen extends StatefulWidget {
-  const ConnectScreen({super.key});
+  final bool forceShowList;
+  const ConnectScreen({super.key, this.forceShowList = false});
 
   @override
   State<ConnectScreen> createState() => _ConnectScreenState();
@@ -29,6 +30,8 @@ class _ConnectScreenState extends State<ConnectScreen>
   final _portCtrl = TextEditingController(text: '8765');
   final _tokenCtrl = TextEditingController(text: 'xrlabs-remote-terminal-2024');
   bool _showManual = false;
+  bool _autoConnecting = false;
+  String _savedServerName = '';
 
   // Radar animation
   late final AnimationController _radarCtrl;
@@ -49,7 +52,13 @@ class _ConnectScreenState extends State<ConnectScreen>
     _pulse = Tween(begin: 0.6, end: 1.0).animate(
       CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
     );
-    _loadPrefs().then((_) => _scan());
+    _loadPrefs().then((_) {
+      if (!widget.forceShowList && _hostCtrl.text.trim().isNotEmpty) {
+        _autoConnect();
+      } else {
+        _scan();
+      }
+    });
   }
 
   @override
@@ -69,8 +78,22 @@ class _ConnectScreenState extends State<ConnectScreen>
         _hostCtrl.text = prefs.getString('host') ?? '';
         _portCtrl.text = prefs.getString('port') ?? '8765';
         _tokenCtrl.text = prefs.getString('token') ?? 'xrlabs-remote-terminal-2024';
+        _savedServerName = prefs.getString('server_name') ?? '';
       });
     }
+  }
+
+  Future<void> _autoConnect() async {
+    if (!mounted) return;
+    setState(() => _autoConnecting = true);
+    final svc = context.read<TerminalService>();
+    final host = _hostCtrl.text.trim();
+    final port = int.tryParse(_portCtrl.text.trim()) ?? 8765;
+    final token = _tokenCtrl.text.trim();
+    await svc.connect(
+      host, port, token,
+      serverName: _savedServerName.isNotEmpty ? _savedServerName : host,
+    );
   }
 
   Future<void> _scan() async {
@@ -93,32 +116,33 @@ class _ConnectScreenState extends State<ConnectScreen>
     if (mounted) setState(() => _scanning = false);
   }
 
-  Future<void> _save() async {
+  Future<void> _save({String? serverName}) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('host', _hostCtrl.text.trim());
     await prefs.setString('port', _portCtrl.text.trim());
     await prefs.setString('token', _tokenCtrl.text.trim());
+    if (serverName != null) await prefs.setString('server_name', serverName);
   }
 
   Future<void> _connectTo(DiscoveryResult r) async {
     _hostCtrl.text = r.host;
-    await _save();
+    await _save(serverName: r.displayName);
     if (!mounted) return;
     final svc = context.read<TerminalService>();
     final port = int.tryParse(_portCtrl.text.trim()) ?? 8765;
     final token = _tokenCtrl.text.trim();
-    await svc.connect(r.host, port, token);
+    await svc.connect(r.host, port, token, serverName: r.displayName);
   }
 
   Future<void> _connectManual() async {
     final host = _hostCtrl.text.trim();
     if (host.isEmpty) return;
-    await _save();
+    await _save(serverName: host);
     if (!mounted) return;
     final svc = context.read<TerminalService>();
     final port = int.tryParse(_portCtrl.text.trim()) ?? 8765;
     final token = _tokenCtrl.text.trim();
-    await svc.connect(host, port, token);
+    await svc.connect(host, port, token, serverName: host);
   }
 
   @override
@@ -141,6 +165,14 @@ class _ConnectScreenState extends State<ConnectScreen>
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const PairingScreen()),
           );
+        }
+      });
+    } else if (_autoConnecting && !svc.isConnecting && !svc.isConnected) {
+      // auto-connect attempt failed — fallback to scan
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() => _autoConnecting = false);
+          _scan();
         }
       });
     }
@@ -182,15 +214,20 @@ class _ConnectScreenState extends State<ConnectScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 24),
-                        _buildScanCard(s),
+                        _autoConnecting
+                            ? _buildConnectingCard(svc)
+                            : _buildScanCard(s),
                         const SizedBox(height: 20),
-                        if (_servers.isNotEmpty || _scanning) _buildServerSection(s, svc),
+                        if (!_autoConnecting && (_servers.isNotEmpty || _scanning))
+                          _buildServerSection(s, svc),
                         if (svc.errorMsg != null) ...[
                           const SizedBox(height: 12),
                           _buildError(svc.errorMsg!),
                         ],
-                        const SizedBox(height: 16),
-                        _buildManualToggle(s, svc),
+                        if (!_autoConnecting) ...[
+                          const SizedBox(height: 16),
+                          _buildManualToggle(s, svc),
+                        ],
                       ],
                     ),
                   ),
@@ -246,6 +283,68 @@ class _ConnectScreenState extends State<ConnectScreen>
             ),
           ),
           LangToggle(lang: lang),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConnectingCard(TerminalService svc) {
+    final name = _savedServerName.isNotEmpty ? _savedServerName : _hostCtrl.text.trim();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1510),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF2A1E0F), width: 1),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 52, height: 52,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: Color(0xFFE07845),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Connecting...',
+                  style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280), fontSize: 11, fontFamily: 'JetBrainsMono',
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              svc.disconnect();
+              setState(() => _autoConnecting = false);
+              _scan();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1F1F1F),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFF2A2A2A), width: 1),
+              ),
+              child: const Icon(Icons.close, color: Color(0xFF6B7280), size: 16),
+            ),
+          ),
         ],
       ),
     );
