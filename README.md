@@ -54,14 +54,16 @@ The installer handles everything:
 - Detects your OS (macOS, Debian/Ubuntu, Arch, Fedora, WSL)
 - Installs Python 3, `websockets`, and `tmux` if missing
 - Optionally installs **Claude Code** (`@anthropic-ai/claude-code`) — includes Node.js if needed
-- Sets up the `/continue-remote` slash command
+- Sets up `/continue-remote` and `/remote-devices-logout` slash commands
 - Creates a global `claude-remote` launcher
+- **Starts the server immediately** after setup
+- **Registers as a login item** — server auto-starts on every boot/login
 
-Then start the server:
+**macOS** — LaunchAgent (`~/Library/LaunchAgents/com.xrlabs.claude-remote.plist`) with `KeepAlive: true`
 
-```bash
-claude-remote
-```
+**Linux** — systemd user service (`~/.config/systemd/user/claude-remote.service`) with `Restart=always`
+
+No need to run anything manually — by the time the installer finishes, the server is already running.
 
 ### Step 2 — Install the app on your Android phone
 
@@ -77,20 +79,18 @@ Open the app — it auto-scans your network and shows your Mac by name. Tap to c
 
 ```
 1. Install server on Mac        →  curl ... | bash
+         ↓                         (server starts automatically + login item registered)
+2. Open app on phone            →  auto-scans network
          ↓
-2. Start server                 →  claude-remote
+3. See your Mac by name         →  "Ishaq's MacBook Pro · 192.168.1.5"
          ↓
-3. Open app on phone            →  auto-scans network
+4. Tap Connect                  →  authenticated WebSocket PTY
          ↓
-4. See your Mac by name         →  "Ishaq's MacBook Pro · 192.168.1.5"
+5. Tap "New Claude Session"     →  full Claude Code terminal on phone
          ↓
-5. Tap Connect                  →  authenticated WebSocket PTY
+6. (Optional) /continue-remote  →  from Mac Claude session → jumps to phone
          ↓
-6. Tap "New Claude Session"     →  full Claude Code terminal on phone
-         ↓
-7. (Optional) /continue-remote  →  from Mac Claude session → jumps to phone
-         ↓
-8. (Optional) Tap laptop icon   →  session hands back to Mac's iTerm2
+7. (Optional) Tap laptop icon   →  session hands back to Mac's iTerm2
 ```
 
 ---
