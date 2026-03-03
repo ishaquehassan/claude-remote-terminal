@@ -32,7 +32,7 @@ Run `claude --continue` sessions from your phone. Type `/continue-remote` in Cla
 - 🤖 **Claude Code first** — Built specifically for Claude Code. One button: "New Claude Session". Nothing else.
 - 📲 **`/continue-remote` slash command** — Type it in Claude Code on your Mac, session instantly opens on your phone.
 - 🔄 **Auto-reconnect** — App reconnects automatically if the connection drops. Never lose context.
-- 🍎 **iTerm2 handoff** — Switch a Claude session back to your Mac's iTerm2 mid-conversation.
+- 🍎 **Mac terminal handoff** — Switch a session back to your Mac mid-conversation. Opens in iTerm2 if installed, falls back to Terminal.app automatically.
 - ⌨️ **Mobile-optimized keys bar** — Tab, Ctrl+D, Esc, arrow keys — all tap-accessible at the bottom.
 - 🏷️ **Session rename** — Name your sessions for easy organization.
 - 🌐 **EN / UR language toggle** — Switch UI language on the fly.
