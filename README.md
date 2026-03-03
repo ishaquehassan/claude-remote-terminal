@@ -72,6 +72,28 @@ Open the app — it auto-scans your network and shows your Mac by name. Tap to c
 
 ---
 
+## 🔄 How It Works
+
+```
+1. Install server on Mac        →  curl ... | bash
+         ↓
+2. Start server                 →  remote-terminal
+         ↓
+3. Open app on phone            →  auto-scans network
+         ↓
+4. See your Mac by name         →  "Ishaq's MacBook Pro · 192.168.1.5"
+         ↓
+5. Tap Connect                  →  authenticated WebSocket PTY
+         ↓
+6. Tap "New Claude Session"     →  full Claude Code terminal on phone
+         ↓
+7. (Optional) /continue-remote  →  from Mac Claude session → jumps to phone
+         ↓
+8. (Optional) Tap laptop icon   →  session hands back to Mac's iTerm2
+```
+
+---
+
 ## 🔍 Auto-Discovery
 
 When you open the app, it immediately scans your local network for running servers. No need to look up your IP address.
