@@ -22,11 +22,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Remote Terminal',
+      title: 'Claude Remote',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0D0D0D),
-        colorScheme: const ColorScheme.dark(primary: Color(0xFF00FF88)),
+        scaffoldBackgroundColor: const Color(0xFF0D0B09),
+        colorScheme: const ColorScheme.dark(primary: Color(0xFFE07845)),
       ),
       home: const ConnectScreen(),
     );

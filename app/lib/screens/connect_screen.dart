@@ -79,7 +79,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${s.serverFound} ${results.first.host}'),
-          backgroundColor: const Color(0xFF00FF88).withAlpha(200),
+          backgroundColor: const Color(0xFFE07845).withAlpha(200),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -96,7 +96,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: results.map((r) => ListTile(
-            leading: const Icon(Icons.computer, color: Color(0xFF00FF88), size: 18),
+            leading: const Icon(Icons.computer, color: Color(0xFFE07845), size: 18),
             title: Text(r.host, style: const TextStyle(color: Colors.white, fontSize: 14)),
             onTap: () => Navigator.pop(context, r.host),
           )).toList(),
@@ -156,7 +156,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
               width: 240, height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF00FF88).withAlpha(12),
+                color: const Color(0xFFE07845).withAlpha(12),
               ),
             ),
           ),
@@ -194,14 +194,14 @@ class _ConnectScreenState extends State<ConnectScreen> {
                         width: 52, height: 52,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF00FF88), Color(0xFF00CC6A)],
+                            colors: [Color(0xFFE07845), Color(0xFFBF5530)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00FF88).withAlpha(80),
+                              color: const Color(0xFFE07845).withAlpha(80),
                               blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),
@@ -214,7 +214,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Remote Terminal',
+                            'Claude Remote',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 22,
@@ -253,14 +253,14 @@ class _ConnectScreenState extends State<ConnectScreen> {
                               side: BorderSide(
                                 color: _scanning
                                     ? const Color(0xFF2D3748)
-                                    : const Color(0xFF00FF88).withAlpha(180),
+                                    : const Color(0xFFE07845).withAlpha(180),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               backgroundColor: _scanning
                                   ? Colors.transparent
-                                  : const Color(0xFF00FF88).withAlpha(10),
+                                  : const Color(0xFFE07845).withAlpha(10),
                             ),
                             icon: _scanning
                                 ? SizedBox(
@@ -268,10 +268,10 @@ class _ConnectScreenState extends State<ConnectScreen> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 1.5,
                                       value: _scanTotal > 0 ? _scanDone / _scanTotal : null,
-                                      color: const Color(0xFF00FF88),
+                                      color: const Color(0xFFE07845),
                                     ),
                                   )
-                                : const Icon(Icons.radar, color: Color(0xFF00FF88), size: 18),
+                                : const Icon(Icons.radar, color: Color(0xFFE07845), size: 18),
                             label: Text(
                               _scanning
                                   ? s.scanning(_scanDone, _scanTotal)
@@ -279,7 +279,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
                               style: TextStyle(
                                 color: _scanning
                                     ? const Color(0xFF4A5568)
-                                    : const Color(0xFF00FF88),
+                                    : const Color(0xFFE07845),
                                 fontSize: 13,
                               ),
                             ),
@@ -341,14 +341,14 @@ class _ConnectScreenState extends State<ConnectScreen> {
                     child: ElevatedButton(
                       onPressed: (svc.isConnecting || _scanning) ? null : _connect,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00FF88),
+                        backgroundColor: const Color(0xFFE07845),
                         foregroundColor: Colors.black,
                         disabledBackgroundColor: const Color(0xFF1A2030),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: svc.isConnecting ? 0 : 8,
-                        shadowColor: const Color(0xFF00FF88).withAlpha(100),
+                        shadowColor: const Color(0xFFE07845).withAlpha(100),
                       ),
                       child: svc.isConnecting
                           ? Row(
@@ -357,7 +357,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
                                 const SizedBox(
                                   width: 18, height: 18,
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: Color(0xFF00FF88),
+                                    strokeWidth: 2, color: Color(0xFFE07845),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -417,7 +417,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFFE07845), width: 1.5),
         ),
       ),
     );

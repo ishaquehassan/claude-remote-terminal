@@ -67,10 +67,18 @@ class SessionsScreen extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: svc.isConnected ? _Fabs(
-        onShell: () => _newSession(context, svc),
-        onClaude: () => _newSession(context, svc, cmd: 'claude'),
-      ) : null,
+      floatingActionButton: svc.isConnected
+          ? FloatingActionButton.extended(
+              heroTag: 'claude',
+              onPressed: () => _newSession(context, svc, cmd: 'claude'),
+              backgroundColor: const Color(0xFFE07845),
+              icon: const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+              label: const Text(
+                'New Claude Session',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+            )
+          : null,
     );
   }
 }
@@ -101,11 +109,11 @@ class _Header extends StatelessWidget {
               Container(
                 width: 36, height: 36,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00FF88).withAlpha(20),
+                  color: const Color(0xFFE07845).withAlpha(20),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFF00FF88).withAlpha(60), width: 1),
+                  border: Border.all(color: const Color(0xFFE07845).withAlpha(60), width: 1),
                 ),
-                child: const Icon(Icons.terminal, color: Color(0xFF00FF88), size: 18),
+                child: const Icon(Icons.terminal, color: Color(0xFFE07845), size: 18),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -128,14 +136,14 @@ class _Header extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 6, right: 4),
                 decoration: BoxDecoration(
                   color: svc.isConnected
-                      ? const Color(0xFF00FF88)
+                      ? const Color(0xFFE07845)
                       : svc.isReconnecting
                           ? Colors.orange
                           : Colors.redAccent,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: (svc.isConnected ? const Color(0xFF00FF88) : Colors.orange)
+                      color: (svc.isConnected ? const Color(0xFFE07845) : Colors.orange)
                           .withAlpha(svc.isConnected ? 120 : 60),
                       blurRadius: 6,
                     ),
@@ -210,15 +218,15 @@ class _EmptyState extends StatelessWidget {
           Container(
             width: 72, height: 72,
             decoration: BoxDecoration(
-              color: const Color(0xFF00FF88).withAlpha(15),
+              color: const Color(0xFFE07845).withAlpha(15),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color(0xFF00FF88).withAlpha(40), width: 1,
+                color: const Color(0xFFE07845).withAlpha(40), width: 1,
               ),
             ),
             child: Icon(
               isReconnecting ? Icons.wifi : Icons.terminal,
-              color: const Color(0xFF00FF88).withAlpha(160),
+              color: const Color(0xFFE07845).withAlpha(160),
               size: 32,
             ),
           ),
@@ -277,7 +285,7 @@ class _SessionList extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
+              borderSide: const BorderSide(color: Color(0xFFE07845), width: 1.5),
             ),
           ),
         ),
@@ -291,7 +299,7 @@ class _SessionList extends StatelessWidget {
               svc.renameSession(session.id, ctrl.text);
               Navigator.pop(context);
             },
-            child: const Text('Save', style: TextStyle(color: Color(0xFF00FF88), fontWeight: FontWeight.w600)),
+            child: const Text('Save', style: TextStyle(color: Color(0xFFE07845), fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -348,7 +356,7 @@ class _SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isClaude ? const Color(0xFFBB86FC) : const Color(0xFF00FF88);
+    final accent = const Color(0xFFE07845);
     final title = displayName ?? session.cmd;
     return GestureDetector(
       onTap: onTap,
@@ -426,66 +434,3 @@ class _SessionCard extends StatelessWidget {
   }
 }
 
-class _Fabs extends StatelessWidget {
-  final VoidCallback onShell;
-  final VoidCallback onClaude;
-  const _Fabs({required this.onShell, required this.onClaude});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        _SmallFab(
-          label: 'Claude',
-          icon: Icons.auto_awesome,
-          color: const Color(0xFFBB86FC),
-          onPressed: onClaude,
-        ),
-        const SizedBox(height: 10),
-        _SmallFab(
-          label: 'Shell',
-          icon: Icons.add,
-          color: const Color(0xFF00FF88),
-          onPressed: onShell,
-          large: true,
-        ),
-      ],
-    );
-  }
-}
-
-class _SmallFab extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onPressed;
-  final bool large;
-  const _SmallFab({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onPressed,
-    this.large = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton.extended(
-      heroTag: label,
-      onPressed: onPressed,
-      backgroundColor: large ? color : color.withAlpha(25),
-      elevation: large ? 4 : 1,
-      label: Text(
-        label,
-        style: TextStyle(
-          color: large ? Colors.black : color,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-        ),
-      ),
-      icon: Icon(icon, color: large ? Colors.black : color, size: 18),
-    );
-  }
-}

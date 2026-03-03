@@ -40,13 +40,13 @@ class _Option extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
       decoration: BoxDecoration(
-        color: active ? const Color(0xFF00FF88).withAlpha(35) : Colors.transparent,
+        color: active ? const Color(0xFFE07845).withAlpha(35) : Colors.transparent,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: active ? const Color(0xFF00FF88) : const Color(0xFF4A5568),
+          color: active ? const Color(0xFFE07845) : const Color(0xFF4A5568),
           fontSize: 11,
           fontWeight: active ? FontWeight.w700 : FontWeight.w400,
           fontFamily: 'JetBrainsMono',
@@ -61,7 +61,7 @@ class S {
   const S(this.ur);
 
   // Connect screen
-  String get appSubtitle => ur ? 'Mac ka terminal, phone pe' : 'Mac terminal on your phone';
+  String get appSubtitle => ur ? 'Claude sessions, phone pe' : 'Claude Code on your phone';
   String get scanBtn => ur ? 'Network pe server dhundo' : 'Scan network for server';
   String get orManually => ur ? 'ya manually' : 'or manually';
   String get noServerFound => ur

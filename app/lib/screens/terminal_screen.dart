@@ -63,7 +63,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
         title: Text(
           svc.sessionNames[widget.sessionId] ?? session?.cmd ?? '...',
           style: const TextStyle(
-            color: Color(0xFF00FF88),
+            color: Color(0xFFE07845),
             fontFamily: 'JetBrainsMono',
             fontSize: 12,
           ),
@@ -71,7 +71,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
         actions: [
           if (!svc.autoOpenSessions.contains(widget.sessionId))
             IconButton(
-              icon: const Icon(Icons.laptop_mac, color: Color(0xFF00FF88), size: 20),
+              icon: const Icon(Icons.laptop_mac, color: Color(0xFFE07845), size: 20),
               tooltip: s.openInIterm,
               onPressed: svc.isConnected
                   ? () => svc.openInIterm(widget.sessionId)
@@ -102,8 +102,8 @@ class _TerminalScreenState extends State<TerminalScreen> {
                     height: 1.2,
                   ),
                   theme: const TerminalTheme(
-                    cursor: Color(0xFF00FF88),
-                    selection: Color(0x4400FF88),
+                    cursor: Color(0xFFE07845),
+                    selection: Color(0x44E07845),
                     foreground: Color(0xFFE8E8E8),
                     background: Color(0xFF000000),
                     black: Color(0xFF1E1E1E),
@@ -225,7 +225,7 @@ class _ReconnectingOverlayState extends State<_ReconnectingOverlay>
               width: 36,
               height: 36,
               child: CircularProgressIndicator(
-                color: Color(0xFF00FF88),
+                color: Color(0xFFE07845),
                 strokeWidth: 2.5,
               ),
             ),
@@ -235,7 +235,7 @@ class _ReconnectingOverlayState extends State<_ReconnectingOverlay>
               child: Text(
                 widget.isReconnecting ? widget.s.reconnecting : widget.s.disconnected,
                 style: const TextStyle(
-                  color: Color(0xFF00FF88),
+                  color: Color(0xFFE07845),
                   fontFamily: 'JetBrainsMono',
                   fontSize: 13,
                   letterSpacing: 0.5,
@@ -272,11 +272,11 @@ class _ItermOverlay extends StatelessWidget {
             Container(
               width: 72, height: 72,
               decoration: BoxDecoration(
-                color: const Color(0xFF00FF88).withAlpha(15),
+                color: const Color(0xFFE07845).withAlpha(15),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF00FF88).withAlpha(50), width: 1),
+                border: Border.all(color: const Color(0xFFE07845).withAlpha(50), width: 1),
               ),
-              child: const Icon(Icons.laptop_mac, color: Color(0xFF00FF88), size: 32),
+              child: const Icon(Icons.laptop_mac, color: Color(0xFFE07845), size: 32),
             ),
             const SizedBox(height: 20),
             Text(
@@ -298,8 +298,8 @@ class _ItermOverlay extends StatelessWidget {
               icon: const Icon(Icons.phone_android, size: 16),
               label: Text(s.takeBack),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00FF88),
-                foregroundColor: Colors.black,
+                backgroundColor: const Color(0xFFE07845),
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
@@ -327,7 +327,6 @@ class _ExtraKeysBar extends StatelessWidget {
         child: Row(
           children: [
             _key('Tab', '\t'),
-            _key('Ctrl+C', '\x03'),
             _key('Ctrl+D', '\x04'),
             _key('Ctrl+L', '\x0C'),
             _key('Ctrl+Z', '\x1A'),
