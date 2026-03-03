@@ -597,7 +597,9 @@ async def handler(websocket):
                     await tx({"type": "auth_ok"})
                     await tx({"type": "sessions_list", "sessions": sessions_list()})
                 else:
-                    pending_pairs.pop(device_id, None)
+                    # Wrong code or expired — only delete if expired
+                    if not pair or time.time() >= pair["expires"]:
+                        pending_pairs.pop(device_id, None)
                     await tx({"type": "pair_fail"})
                 continue
 
