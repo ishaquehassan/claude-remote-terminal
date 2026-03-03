@@ -269,11 +269,15 @@ def cleanup_session(sid):
 
 
 def open_iterm(shell_cmd, tab_name):
-    """Open a terminal window/tab and run shell_cmd. Mac uses iTerm2, Linux uses best available."""
+    """Open a terminal window/tab and run shell_cmd. Mac uses iTerm2 or Terminal.app, Linux uses best available."""
     if IS_MAC:
         apple_cmd = shell_cmd.replace('\\', '\\\\').replace('"', '\\"')
         safe_name = tab_name.replace('"', '\\"')
-        script = f"""
+        # Check if iTerm2 is installed
+        iterm_installed = os.path.exists("/Applications/iTerm.app") or \
+                          os.path.exists(os.path.expanduser("~/Applications/iTerm.app"))
+        if iterm_installed:
+            script = f"""
 tell application "iTerm2"
     activate
     if (count of windows) = 0 then
@@ -288,6 +292,14 @@ tell application "iTerm2"
     end tell
 end tell
 """
+        else:
+            # Fallback: Terminal.app (always available on macOS)
+            script = f"""
+tell application "Terminal"
+    activate
+    do script "{apple_cmd}"
+end tell
+"""
         subprocess.Popen(["osascript", "-e", script])
     else:
         # Linux: try common terminal emulators
@@ -296,6 +308,7 @@ end tell
             ("xterm",          ["-e", f"{shell_cmd}"]),
             ("konsole",        ["-e", f"{shell_cmd}"]),
             ("xfce4-terminal", ["-e", f"{shell_cmd}"]),
+            ("xterm",          ["-e", "bash", "-c", f"{shell_cmd}; exec bash"]),
         ]:
             if shutil.which(term):
                 subprocess.Popen([term] + args)
