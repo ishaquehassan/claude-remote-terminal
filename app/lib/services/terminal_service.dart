@@ -49,6 +49,10 @@ class TerminalService extends ChangeNotifier {
   String? connectedServerName;
   String? get connectedHost => _savedHost;
 
+  // Force logout (all devices kicked)
+  bool forceLogout = false;
+  void clearForceLogout() { forceLogout = false; notifyListeners(); }
+
   // Pairing
   bool isPairRequired = false;
   bool pairFailed = false;
@@ -249,6 +253,28 @@ class TerminalService extends ChangeNotifier {
 
         case 'pair_fail':
           pairFailed = true;
+          notifyListeners();
+          break;
+
+        case 'force_logout':
+          forceLogout = true;
+          _reconnectTimer?.cancel();
+          _savedHost = null;
+          connectedServerName = null;
+          isReconnecting = false;
+          _sub?.cancel();
+          _channel?.sink.close();
+          _channel = null;
+          isConnected = false;
+          isConnecting = false;
+          sessions.clear();
+          sessionNames.clear();
+          itermSessions.clear();
+          autoOpenSessions.clear();
+          _sizes.clear();
+          activeSessionId = null;
+          isPairRequired = false;
+          pairFailed = false;
           notifyListeners();
           break;
 

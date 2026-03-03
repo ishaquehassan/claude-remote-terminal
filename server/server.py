@@ -751,6 +751,18 @@ async def handler(websocket):
                 await asyncio.to_thread(open_iterm, shell_cmd, tab_name)
                 await tx({"type": "iterm_opened", "session_id": sid})
 
+            # ── logout_all_devices ───────────────────────────────────────────
+            elif t == "logout_all_devices":
+                count = len(paired_devices)
+                paired_devices.clear()
+                save_paired(paired_devices)
+                force_logout_msg = json.dumps({"type": "force_logout"})
+                for q in all_client_queues:
+                    if q is not my_global_q:
+                        q.put_nowait(force_logout_msg)
+                print(f"\033[1;33m[server] All devices logged out ({count} cleared)\033[0m")
+                await tx({"type": "logout_ok", "count": count})
+
             # ── list_sessions ────────────────────────────────────────────────
             elif t == "list_sessions":
                 await tx({"type": "sessions_list", "sessions": sessions_list()})

@@ -36,6 +36,7 @@ Run `claude --continue` sessions from your phone. Type `/continue-remote` in Cla
 - ⌨️ **Mobile-optimized keys bar** — Tab, Ctrl+D, Esc, arrow keys — all tap-accessible at the bottom.
 - 🏷️ **Session rename** — Name your sessions for easy organization.
 - 🌐 **EN / UR language toggle** — Switch UI language on the fly.
+- 🔒 **`/remote-devices-logout`** — Kick all paired phones instantly from Claude Code on your Mac.
 - 🖥️ **Cross-platform server** — macOS (Homebrew), Linux (apt / pacman / dnf), Windows via WSL.
 - ⚡ **Zero-hang async core** — All subprocess calls in `asyncio.to_thread()` — the event loop never blocks.
 
@@ -128,6 +129,19 @@ cp commands/continue-remote.md ~/.claude/commands/
 mkdir -p ~/.claude/scripts
 cp scripts/continue_remote.py ~/.claude/scripts/
 ```
+
+---
+
+## 🔒 /remote-devices-logout
+
+Type `/remote-devices-logout` in any Claude Code session on your Mac to instantly kick all paired devices.
+
+### How it works
+
+1. Claude runs `python3 ~/.claude/scripts/remote_logout.py`
+2. Script connects to the local server and sends `logout_all_devices`
+3. Server clears `~/.remote-terminal/paired_devices.json`
+4. All connected phones receive `force_logout` and are automatically sent back to the server selection screen
 
 ---
 

@@ -40,6 +40,19 @@ class SessionsScreen extends StatelessWidget {
     final lang = context.watch<LanguageService>();
     final s = S(lang.isUrdu);
 
+    // Server ne force_logout bheja — wapis server list pe jao
+    if (svc.forceLogout) {
+      svc.clearForceLogout();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const ConnectScreen(forceShowList: true)),
+            (r) => false,
+          );
+        }
+      });
+    }
+
     // /continue-remote command ne auto_open_session bheja — seedha navigate karo
     final autoSid = svc.autoOpenSessionId;
     if (autoSid != null && svc.sessions.containsKey(autoSid)) {

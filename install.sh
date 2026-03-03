@@ -162,9 +162,11 @@ fi
 step "[ 4 / 6 ]  Downloading Remote Terminal server..."
 
 mkdir -p "$INSTALL_DIR"
-curl -fsSL "$RAW/server/server.py"              -o "$INSTALL_DIR/server.py"
-curl -fsSL "$RAW/scripts/continue_remote.py"    -o "$INSTALL_DIR/continue_remote.py"
-curl -fsSL "$RAW/commands/continue-remote.md"   -o "$INSTALL_DIR/continue-remote.md"
+curl -fsSL "$RAW/server/server.py"                   -o "$INSTALL_DIR/server.py"
+curl -fsSL "$RAW/scripts/continue_remote.py"         -o "$INSTALL_DIR/continue_remote.py"
+curl -fsSL "$RAW/scripts/remote_logout.py"           -o "$INSTALL_DIR/remote_logout.py"
+curl -fsSL "$RAW/commands/continue-remote.md"        -o "$INSTALL_DIR/continue-remote.md"
+curl -fsSL "$RAW/commands/remote-devices-logout.md"  -o "$INSTALL_DIR/remote-devices-logout.md"
 ok "Server installed to $INSTALL_DIR"
 
 # ── Claude Code slash command ──────────────────────────────────────────────────
@@ -172,14 +174,19 @@ step "[ 5 / 6 ]  Setting up /continue-remote command..."
 
 if command -v claude &>/dev/null; then
     mkdir -p "$HOME/.claude/commands" "$HOME/.claude/scripts"
-    cp "$INSTALL_DIR/continue_remote.py"  "$HOME/.claude/scripts/"
-    cp "$INSTALL_DIR/continue-remote.md"  "$HOME/.claude/commands/"
+    cp "$INSTALL_DIR/continue_remote.py"         "$HOME/.claude/scripts/"
+    cp "$INSTALL_DIR/remote_logout.py"           "$HOME/.claude/scripts/"
+    cp "$INSTALL_DIR/continue-remote.md"         "$HOME/.claude/commands/"
+    cp "$INSTALL_DIR/remote-devices-logout.md"   "$HOME/.claude/commands/"
     ok "/continue-remote command installed"
+    ok "/remote-devices-logout command installed"
 else
     warn "Claude Code not found — skipping"
     warn "To set up later:"
     warn "  cp $INSTALL_DIR/continue_remote.py ~/.claude/scripts/"
+    warn "  cp $INSTALL_DIR/remote_logout.py ~/.claude/scripts/"
     warn "  cp $INSTALL_DIR/continue-remote.md ~/.claude/commands/"
+    warn "  cp $INSTALL_DIR/remote-devices-logout.md ~/.claude/commands/"
 fi
 
 # ── Create launcher ────────────────────────────────────────────────────────────
