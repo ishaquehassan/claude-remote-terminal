@@ -307,6 +307,156 @@ def sessions_list():
     return [{"id": s, "cmd": v["cmd"]} for s, v in sessions.items()]
 
 
+# ── Pairing browser page ───────────────────────────────────────────────────────
+
+def open_pair_page(code: str):
+    """Write a styled HTML file and open it in the default browser."""
+    digit_boxes = "\n".join(
+        f'<div class="digit">{d}</div>' for d in code
+    )
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Remote — Pair Device</title>
+<style>
+  * {{ margin:0; padding:0; box-sizing:border-box; }}
+  body {{
+    background: #0D0B09;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; color: #fff;
+  }}
+  .card {{
+    text-align: center;
+    padding: 52px 48px;
+    background: #13100D;
+    border: 1px solid #2A1E0F;
+    border-radius: 28px;
+    box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(224,120,69,.06);
+    max-width: 480px; width: 100%;
+  }}
+  .logo {{
+    width: 68px; height: 68px;
+    background: linear-gradient(135deg, #E07845 0%, #BF5530 100%);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 8px 28px rgba(224,120,69,.35);
+  }}
+  h1 {{ font-size: 26px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 8px; }}
+  .sub {{ color: #6B7280; font-size: 14px; margin-bottom: 40px; line-height: 1.5; }}
+  .digits {{ display: flex; gap: 14px; justify-content: center; margin-bottom: 32px; }}
+  .digit {{
+    width: 82px; height: 100px;
+    background: #1A1510;
+    border: 2px solid #E07845;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 50px; font-weight: 700;
+    font-family: 'Courier New', 'Menlo', monospace;
+    color: #fff;
+    box-shadow: 0 0 28px rgba(224,120,69,.18), inset 0 1px 0 rgba(255,255,255,.04);
+    animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+  }}
+  .digit:nth-child(1) {{ animation-delay: .05s; }}
+  .digit:nth-child(2) {{ animation-delay: .12s; }}
+  .digit:nth-child(3) {{ animation-delay: .19s; }}
+  .digit:nth-child(4) {{ animation-delay: .26s; }}
+  @keyframes popIn {{
+    from {{ opacity:0; transform: scale(.6) translateY(8px); }}
+    to   {{ opacity:1; transform: scale(1) translateY(0); }}
+  }}
+  .timer-row {{ color: #6B7280; font-size: 13px; margin-bottom: 28px; }}
+  #timer {{ color: #E07845; font-weight: 600; font-variant-numeric: tabular-nums; }}
+  .progress-wrap {{
+    height: 4px; background: #1F1A15; border-radius: 99px;
+    margin-bottom: 28px; overflow: hidden;
+  }}
+  #progress {{
+    height: 100%; background: #E07845; border-radius: 99px;
+    width: 100%; transition: width 1s linear;
+  }}
+  .hint {{
+    background: #1A1510; border: 1px solid #2A1E0F;
+    border-radius: 14px; padding: 16px 20px;
+    font-size: 13px; color: #9CA3AF; line-height: 1.65;
+  }}
+  .hint strong {{ color: #E07845; }}
+  .expired {{
+    display: none; color: #EF4444; font-size: 14px;
+    font-weight: 600; margin-top: 20px;
+  }}
+  .paired {{
+    display: none; color: #4ADE80; font-size: 14px;
+    font-weight: 600; margin-top: 20px;
+  }}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L13.8 8.2L20 7L15.8 11.8L18 18L12 14.8L6 18L8.2 11.8L4 7L10.2 8.2L12 2Z"
+            fill="white" stroke="white" stroke-width=".5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <h1>Pair New Device</h1>
+  <p class="sub">A new phone is trying to connect.<br>Enter this code on your phone to allow access.</p>
+  <div class="digits">
+{digit_boxes}
+  </div>
+  <div class="progress-wrap"><div id="progress"></div></div>
+  <div class="timer-row">Expires in <span id="timer">2:00</span></div>
+  <div class="hint">
+    Open <strong>Claude Remote</strong> on your Android and<br>
+    type this code in the pairing screen.
+  </div>
+  <div class="expired" id="expired">⏱ Code expired — reconnect from your phone to get a new one</div>
+</div>
+<script>
+  let secs = 120;
+  const timerEl  = document.getElementById('timer');
+  const progressEl = document.getElementById('progress');
+  const expiredEl = document.getElementById('expired');
+  const digits = document.querySelectorAll('.digit');
+
+  const tick = setInterval(() => {{
+    secs--;
+    progressEl.style.width = (secs / 120 * 100) + '%';
+    if (secs <= 0) {{
+      clearInterval(tick);
+      timerEl.parentElement.style.display = 'none';
+      expiredEl.style.display = 'block';
+      digits.forEach(d => {{
+        d.style.borderColor = '#EF4444';
+        d.style.color = '#9CA3AF';
+      }});
+      return;
+    }}
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    timerEl.textContent = m + ':' + String(s).padStart(2, '0');
+    if (secs <= 30) timerEl.style.color = '#EF4444';
+  }}, 1000);
+</script>
+</body>
+</html>"""
+
+    html_dir = os.path.expanduser("~/.remote-terminal/")
+    os.makedirs(html_dir, exist_ok=True)
+    html_path = os.path.join(html_dir, "pair.html")
+    with open(html_path, "w") as f:
+        f.write(html)
+
+    file_url = f"file://{html_path}"
+    if IS_MAC:
+        subprocess.Popen(["open", file_url])
+    else:
+        subprocess.Popen(["xdg-open", file_url])
+
+
 # ─── PTY reader thread ────────────────────────────────────────────────────────
 
 def pty_reader_thread(sid, loop):
@@ -412,7 +562,7 @@ async def handler(websocket):
                         "code": code,
                         "expires": time.time() + 120,
                     }
-                    # Print on Mac terminal — very visible
+                    # Print on terminal + open browser page
                     digits = "  ".join(list(code))
                     print("\n\033[1;33m" + "╔══════════════════════════════════════╗")
                     print("║                                      ║")
@@ -424,6 +574,7 @@ async def handler(websocket):
                     print("║   Expires in 2 minutes               ║")
                     print("║                                      ║")
                     print("╚══════════════════════════════════════╝\033[0m\n")
+                    await asyncio.to_thread(open_pair_page, code)
                     await tx({"type": "pair_required"})
                 else:
                     # No device_id (old client) — allow without pairing
