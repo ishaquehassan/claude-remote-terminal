@@ -12,7 +12,7 @@
 
 **Claude Code on your Android phone — resume AI coding sessions anywhere, over WebSocket PTY.**
 
-[Quick Install](#-quick-install) · [Features](#-features) · [/continue-remote](#-continue-remote) · [Architecture](#-architecture) · [Manual Setup](#-manual-setup)
+[Quick Install](#-quick-install) · [Features](#-features) · [Slash Commands](#-claude-code-slash-commands) · [Architecture](#-architecture) · [Manual Setup](#-manual-setup)
 
 </div>
 
@@ -108,40 +108,55 @@ If multiple people on the same network have the server running, you'll see all o
 
 ---
 
-## 🤖 /continue-remote
+## ⚡ Claude Code Slash Commands
 
-Type `/continue-remote` in any Claude Code session on your Mac. Your phone opens that exact session automatically — `claude --continue` resumes the full conversation.
+Claude Remote installs custom slash commands into Claude Code — type them directly in any Claude session on your Mac. No setup needed, the installer handles everything.
 
-### How it works
+| Command | What it does |
+|---------|-------------|
+| `/continue-remote` | Push your current Claude session to your phone instantly |
+| `/remote-devices-logout` | Kick all paired phones and clear device list |
 
-1. You're coding with Claude on your Mac
+---
+
+### `/continue-remote`
+
+Type it in any Claude Code session on your Mac. Your phone opens that exact session automatically — `claude --continue` resumes the full conversation from where you left off.
+
+**How it works:**
+
+1. You're deep in a Claude session on your Mac
 2. You type `/continue-remote`
-3. Claude runs `python3 ~/.claude/scripts/continue_remote.py`
-4. The script connects to your server and broadcasts the session (with current working directory)
+3. Claude runs `~/.claude/scripts/continue_remote.py`
+4. Script broadcasts the session ID + working directory to your server
 5. Your phone receives it and navigates directly to the terminal
 
-### Setup
-
-The installer does this automatically. Manual setup:
+**Manual install (if needed):**
 
 ```bash
 cp commands/continue-remote.md ~/.claude/commands/
-mkdir -p ~/.claude/scripts
-cp scripts/continue_remote.py ~/.claude/scripts/
+mkdir -p ~/.claude/scripts && cp scripts/continue_remote.py ~/.claude/scripts/
 ```
 
 ---
 
-## 🔒 /remote-devices-logout
+### `/remote-devices-logout`
 
-Type `/remote-devices-logout` in any Claude Code session on your Mac to instantly kick all paired devices.
+Type it to instantly revoke access for all paired phones — useful before lending your Mac, changing networks, or rotating your auth token.
 
-### How it works
+**How it works:**
 
-1. Claude runs `python3 ~/.claude/scripts/remote_logout.py`
-2. Script connects to the local server and sends `logout_all_devices`
-3. Server clears `~/.remote-terminal/paired_devices.json`
-4. All connected phones receive `force_logout` and are automatically sent back to the server selection screen
+1. Claude runs `~/.claude/scripts/remote_logout.py`
+2. Script sends `logout_all_devices` to the local server
+3. Server wipes `~/.remote-terminal/paired_devices.json`
+4. Every connected phone receives a `force_logout` signal and is automatically redirected to the server selection screen
+
+**Manual install (if needed):**
+
+```bash
+cp commands/remote-devices-logout.md ~/.claude/commands/
+mkdir -p ~/.claude/scripts && cp scripts/remote_logout.py ~/.claude/scripts/
+```
 
 ---
 
@@ -241,15 +256,17 @@ AUTH_TOKEN = "xrlabs-remote-terminal-2024"  # change this
 ```
 claude-remote-terminal/
 ├── server/
-│   └── server.py          # Python WebSocket PTY server
-├── app/                   # Flutter Android app
+│   └── server.py                    # Python WebSocket PTY server
+├── app/                             # Flutter Android app
 │   └── lib/
 ├── commands/
-│   └── continue-remote.md # Claude Code slash command
+│   ├── continue-remote.md           # /continue-remote slash command
+│   └── remote-devices-logout.md    # /remote-devices-logout slash command
 ├── scripts/
-│   └── continue_remote.py # /continue-remote script
-├── install.sh             # One-command installer
-├── start.sh               # Quick server start
+│   ├── continue_remote.py           # /continue-remote script
+│   └── remote_logout.py             # /remote-devices-logout script
+├── install.sh                       # One-command installer
+├── start.sh                         # Quick server start
 └── README.md
 ```
 
