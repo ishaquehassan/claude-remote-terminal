@@ -1,20 +1,8 @@
-```
-██████╗ ███████╗███╗   ███╗ ██████╗ ████████╗███████╗
-██╔══██╗██╔════╝████╗ ████║██╔═══██╗╚══██╔══╝██╔════╝
-██████╔╝█████╗  ██╔████╔██║██║   ██║   ██║   █████╗
-██╔══██╗██╔══╝  ██║╚██╔╝██║██║   ██║   ██║   ██╔══╝
-██║  ██║███████╗██║ ╚═╝ ██║╚██████╔╝   ██║   ███████╗
-╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝   ╚═╝   ╚══════╝
-
-████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗
-╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║
-   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║
-   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║
-   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗
-   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
-```
-
 <div align="center">
+
+<img src="app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="120" alt="Claude Remote" />
+
+## Claude Remote
 
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Android-blue?style=flat-square&logo=apple)](https://github.com/ishaquehassan/claude-remote-terminal)
 [![Python](https://img.shields.io/badge/python-3.10%2B-yellow?style=flat-square&logo=python)](https://www.python.org/)
