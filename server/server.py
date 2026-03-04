@@ -32,6 +32,7 @@ import time
 
 PORT = 8765
 AUTH_TOKEN = "xrlabs-remote-terminal-2024"
+SCROLLBACK_SIZE = 100 * 1024  # 100 KB per session
 
 # tmux path — auto-detect so it works on Mac (brew) and Linux (apt)
 TMUX = shutil.which("tmux") or "tmux"
@@ -114,6 +115,7 @@ def _spawn_claude(cmd, rows, cols, cwd=None):
     sessions[sid] = {
         "proc": proc, "fd": master_fd, "cmd": cmd,
         "rows": rows, "cols": cols, "tmux": None, "iterm_tab": None,
+        "scrollback": bytearray(),
     }
     print(f"[server] Claude session {sid} spawned pid={proc.pid}")
     return sid
@@ -161,6 +163,7 @@ def _spawn_shell(cmd, rows, cols, cwd=None):
         "proc": proc, "fd": master_fd, "cmd": cmd,
         "rows": rows, "cols": cols, "tmux": tmux_name,
         "iterm_tab": None, "phone_tty": phone_tty,
+        "scrollback": bytearray(),
     }
     print(f"[server] Shell session {sid} spawned tmux={tmux_name} pid={proc.pid}")
     return sid
@@ -490,6 +493,13 @@ def pty_reader_thread(sid, loop):
             data = os.read(fd, 4096)
             if not data:
                 break
+            # Update scrollback buffer
+            session = sessions.get(sid)
+            if session is not None:
+                sb = session["scrollback"]
+                sb.extend(data)
+                if len(sb) > SCROLLBACK_SIZE:
+                    del sb[:len(sb) - SCROLLBACK_SIZE]
             text = data.decode("utf-8", errors="replace")
             msg = json.dumps({"type": "output", "session_id": sid, "data": text})
             for q in list(client_queues.get(sid, [])):
@@ -688,7 +698,35 @@ async def handler(websocket):
                         if client_tty != phone_tty:
                             await asyncio.to_thread(tmux_detach_client, client_tty)
 
+                # Replay scrollback buffer — client Terminal is fresh (app was killed),
+                # send last N KB of PTY output so it shows previous state immediately.
+                sb = sessions[sid].get("scrollback")
+                if sb:
+                    sb_data = bytes(sb).decode("utf-8", errors="replace")
+                    if sb_data:
+                        await tx({"type": "output", "session_id": sid, "data": sb_data})
+
                 await tx({"type": "attached", "session_id": sid})
+
+                # Force full repaint: same-size SIGWINCH is ignored by Ink/Claude.
+                # Change size by 1 row then restore — guarantees two distinct
+                # SIGWINCHes so Claude/Ink does a complete screen redraw.
+                _sid = sid
+                _r   = sessions[sid]["rows"]
+                _c   = sessions[sid]["cols"]
+
+                async def _force_repaint(s_id, r0, c0):
+                    await asyncio.sleep(0.35)   # let client build TerminalView
+                    if s_id not in sessions:
+                        return
+                    r_tmp = (r0 - 1) if r0 > 5 else (r0 + 1)
+                    set_winsize(sessions[s_id]["fd"], r_tmp, c0)
+                    await asyncio.sleep(0.15)   # let Claude process first SIGWINCH
+                    if s_id not in sessions:
+                        return
+                    set_winsize(sessions[s_id]["fd"], r0, c0)
+
+                asyncio.create_task(_force_repaint(_sid, _r, _c))
 
             # ── input ────────────────────────────────────────────────────────
             elif t == "input":

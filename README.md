@@ -32,6 +32,7 @@ Run `claude --continue` sessions from your phone. Type `/continue-remote` in Cla
 - 🤖 **Claude Code first** — Built specifically for Claude Code. One button: "New Claude Session". Nothing else.
 - 📲 **`/continue-remote` slash command** — Type it in Claude Code on your Mac, session instantly opens on your phone.
 - 🔄 **Auto-reconnect** — App reconnects automatically if the connection drops. Never lose context.
+- 💾 **Session history persistence** — Kill the app and reopen it — your terminal history is exactly where you left it. Server keeps a rolling scrollback buffer per session and replays it on re-attach.
 - 🍎 **Mac terminal handoff** — Switch a session back to your Mac mid-conversation. Opens in iTerm2 if installed, falls back to Terminal.app automatically.
 - ⌨️ **Mobile-optimized keys bar** — Tab, Ctrl+D, Esc, arrow keys — all tap-accessible at the bottom.
 - 🏷️ **Session rename** — Name your sessions for easy organization.
@@ -67,7 +68,7 @@ No need to run anything manually — by the time the installer finishes, the ser
 
 ### Step 2 — Install the app on your Android phone
 
-Download `claude-remote-v1.0.0.apk` from [Releases](https://github.com/ishaquehassan/claude-remote-terminal/releases/latest) and install it.
+Download `claude-remote-v1.4.0.apk` from [Releases](https://github.com/ishaquehassan/claude-remote-terminal/releases/latest) and install it.
 
 Open the app — it auto-scans your network and shows your Mac by name. Tap to connect.
 
@@ -340,10 +341,35 @@ claude-remote-terminal/
 ├── scripts/
 │   ├── continue_remote.py           # /continue-remote script
 │   └── remote_logout.py             # /remote-devices-logout script
+├── test_history.py                  # ADB automation: session history persistence test
 ├── install.sh                       # One-command installer
 ├── start.sh                         # Quick server start
 └── README.md
 ```
+
+---
+
+## 🧪 Testing
+
+`test_history.py` is an ADB-driven automation script that verifies session history persists correctly across app kills.
+
+**What it does:**
+1. Launches the app fresh
+2. Creates a new Claude session
+3. Sends N random conversational prompts (mix of short / medium / long, different every run)
+4. Kills the app
+5. Relaunches and opens the same session
+6. Verifies history is rendered — not blank, content matches before kill
+7. Cleans up all sessions for a fresh next cycle
+
+**Usage:**
+```bash
+python3 test_history.py                        # 1 cycle, 4 prompts
+python3 test_history.py --cycles 3             # 3 full cycles
+python3 test_history.py --cycles 2 --prompts 6 --output ./results
+```
+
+**Requirements:** ADB connected device (USB or wireless), server running locally.
 
 ---
 

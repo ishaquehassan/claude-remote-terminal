@@ -211,12 +211,6 @@ class TerminalService extends ChangeNotifier {
           final attachedSid = msg['session_id'] as String;
           activeSessionId = attachedSid;
           notifyListeners();
-          Future.delayed(const Duration(milliseconds: 800), () {
-            sendInput(attachedSid, '\r');
-            Future.delayed(const Duration(milliseconds: 200), () {
-              sendInput(attachedSid, '\x0c');
-            });
-          });
           break;
 
         case 'output':
